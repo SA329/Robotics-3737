@@ -16,6 +16,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
+import static java.lang.Math.abs;
+
 import android.util.Size;
 
 public class Robot {
@@ -33,11 +35,16 @@ public class Robot {
     DcMotorEx sR;
 
     // intake
+    //x odometry wheel
     DcMotorEx I;
 
     // movement between intake and outtake
     CRServo fL;
     CRServo fR;
+
+    // odometry wheels
+    DcMotor oL;
+    //DcMotor oR;
 
     AprilTagProcessor processor;
     VisionPortal vision;
@@ -46,15 +53,21 @@ public class Robot {
 
         HardwareMap mapping = ln.hardwareMap;
 
-        lF = (DcMotorEx) mapping.dcMotor.get("lF");
+        lF = (DcMotorEx) mapping.dcMotor.get("leftFront");
         lB = (DcMotorEx) mapping.dcMotor.get("lB");
         rB = (DcMotorEx) mapping.dcMotor.get("rB");
         rF = (DcMotorEx) mapping.dcMotor.get("rF");
+        I = (DcMotorEx) mapping.dcMotor.get("Intake");
 
         sL = (DcMotorEx) mapping.dcMotor.get("sL");
         sR = (DcMotorEx) mapping.dcMotor.get("sR");
+
         fL = mapping.crservo.get("fL");
         fR = mapping.crservo.get("fR");
+        //beam = mapping.crservo.get("beam");
+
+        oL = mapping.dcMotor.get("oL");
+        //oR = mapping.dcMotor.get("oR");
 
         processor = new AprilTagProcessor.Builder()
                 .setDrawTagID(true)
@@ -82,6 +95,13 @@ public class Robot {
 
         fL.setDirection(DcMotorSimple.Direction.REVERSE);
         fR.setDirection(DcMotorSimple.Direction.FORWARD);
+        //beam.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        I.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        oL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        I.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //oR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public void drive360(double x,  double y, double pwr) {
