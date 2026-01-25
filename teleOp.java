@@ -34,9 +34,12 @@ public class teleOp extends LinearOpMode {
 //          APRIL TAG TESTING
             AprilTagPoseFtc state = robot.getState();
 
+            double mag;
+            double yaw = 0;
+
             if(state != null) {
-                double mag = state.range; //Distance from camera to tag
-                double yaw = state.yaw;
+                mag = state.range; //Distance from camera to tag
+                yaw = state.yaw; // angle from camera to tag
 
                 telemetry.addData("Magnitude", mag);
                 telemetry.addData("Yaw", yaw);
@@ -51,6 +54,9 @@ public class teleOp extends LinearOpMode {
             telemetry.addLine("------------------------------");
             telemetry.addData("lF.currentPosition", robot.lF.getCurrentPosition());
             telemetry.addData("rF.currentPosition", robot.rF.getCurrentPosition());
+
+            telemetry.addData("encoderY pos", robot.oL.getCurrentPosition());
+            telemetry.addData("encoderX pos", robot.I.getCurrentPosition());
 
             telemetry.update();
 
@@ -89,9 +95,9 @@ public class teleOp extends LinearOpMode {
             } else if (gamepad1.right_trigger > 0.1) {
                 robot.go("left", v1); //they're opposite for whatever reason
             } else if(gamepad1.left_bumper) {
-                robot.turn("left", v1 * .2);
+                robot.turn("left", v1 * .3);
             } else if(gamepad1.right_bumper) {
-                robot.turn("right", v1 * .2);
+                robot.turn("right", v1 * .3);
             } else if (gamepad1.right_stick_x > .1 || gamepad1.right_stick_x < -.1) {
                 robot.turn("right", gamepad1.right_stick_x * v1);
             } else if(leftStickCheck) {
@@ -102,8 +108,13 @@ public class teleOp extends LinearOpMode {
 
 //          LAUNCHER
 
-            // another strategy: leave the spinners running, change speed
-            // our strategy: hold the button down to spin
+            if(gamepad1.b || gamepad2.b) {
+                robot.I.setPower(1);
+            } else if (gamepad1.x || gamepad2.x) {
+                robot.I.setPower(-0.7);
+            } else {
+                robot.I.setPower(0);
+            }
 
             if(gamepad2.right_trigger > 0.1) {
                 robot.sL.setPower(v2);
@@ -113,16 +124,26 @@ public class teleOp extends LinearOpMode {
                 robot.sR.setPower(0);
             }
 
-            if(gamepad2.dpad_up) {
-                robot.I.setPower(0.6);
+            if(gamepad2.right_bumper) {
+                // robot.beam.setPower(1);
+            } else {
+                // robot.beam.setPower(0);
+            }
+
+            if(gamepad1.dpad_up) {
+                if (yaw <= 0.09) {
+                    robot.turn("right", 0.2);
+                } else if (yaw >= 0.11) {
+                    robot.turn("right", 0.2);
+                }
             }
 
             if(gamepad2.left_trigger > 0.1) {
-                robot.fL.setPower(1);
-                robot.fR.setPower(1);
-            } else if(gamepad2.left_bumper) {
-                robot.fL.setPower(-.7);
-                robot.fR.setPower(-.7);
+                robot.fL.setPower(0.7);
+                robot.fR.setPower(0.7);
+            } if(gamepad2.left_bumper) {
+                robot.fL.setPower(-1);
+                robot.fR.setPower(-1);
             } else {
                 robot.fL.setPower(0);
                 robot.fR.setPower(0);
